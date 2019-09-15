@@ -15,11 +15,140 @@
 				font-size: 16px;
 			}
 		</style>
+
+		<script src="https://cdn.jsdelivr.net/gh/fauna/faunadb-js-release@2.8.1/faunadb-min.js"></script>
+		<script>
+			// Set secret
+			const secret = 'CHANGE THIS';
+
+			// Set up client
+			let q = faunadb.query,
+				client = new faunadb.Client({
+					secret
+				});
+
+			// Set up database connection; assume the test database is up
+			client.query(q.CreateKey({
+				database: q.Database("test-database"),
+				role: "server"
+			}))
+			.then(data => {
+				console.log(data);
+
+				activateButtons();
+			});
+
+			function activateButtons() {
+				const buttons = document.querySelectorAll("button.button-crud");
+
+				buttons.forEach(button => {
+					button.disabled = false;
+				});
+			};
+
+		</script>
 	</head>
 
 	<body>
 		<section>
 			<h1>Demo: Netlify with FaunaDB</h1>
+
+			<p>Make sure to pop out your console, since a fair bit of output is going to end up there.</p>
+
+			<!--
+			<div id="OutputArea">
+				<h2>From FaunaDB</h2>
+			</div>
+
+			<input type="text" />
+			-->
+
+			<div id="ButtonsAreaMain">
+				<button onclick="faunaCreateDb()">1. Create test database</button>
+				<button onclick="faunaCreateCollection()">2. Create collection</button>
+				<button onclick="faunaCreateIndex()">3. Create index</button>
+			</div>
+
+			<div id="ButtonsAreaCrud"></div>
+				<button onclick="faunaCreate()" class="button-crud" disabled="true">Create</button>
+				<button onclick="faunaRead()" class="button-crud" disabled="true">Read</button>
+				<button onclick="faunaUpdate()" class="button-crud" disabled="true">Update</button>
+				<button onclick="faunaDelete()" class="button-crud" disabled="true">Delete</button>
+			</div>
 		</section>
+
+		<script>
+			function faunaCreateDb() {
+				console.log('create new db');
+
+				client
+					.query(q.CreateDatabase({ name: 'test-database' }))
+					.then(data => console.log(data))
+					.catch(error => console.error(error));
+			}
+
+			function faunaCreateCollection() {
+				console.log('create new collection');
+
+				client
+					.query(q.CreateCollection({ name: "test-collection" }))
+					.then(data => console.log(data))
+					.catch(error => console.error(error));
+			}
+
+			function faunaCreateIndex() {
+				console.log('create new index');
+
+				client
+					.query(q.CreateIndex({
+						name: "posts_by_tags_with_title",
+						source: q.Collection("test-collection"),
+						terms: [{ field: ["data", "tags"]}],
+						values: [{ field: ["data", "title"] }]
+					}))
+					.then(data => console.log(data))
+					.catch(error => console.error(error));
+			}
+
+			function faunaCreate() {
+				console.log('create');
+
+				client
+					.query(
+						q.Create(
+							q.Collection("test-collection"),
+							{ data: { title: "What I had for breakfast .." }
+						}))
+					.then(data => console.log(data))
+					.catch(error => console.error(error));
+			}
+
+			function faunaRead() {
+				console.log('read');
+
+				client
+					.query(q.Get(q.Ref(q.Collection("test-collection"), "243591207984300546")))
+					.then(data => console.log(data))
+					.catch(error => console.error(error));
+			}
+
+			function faunaUpdate() {
+				console.log('update');
+
+				client
+					.query(q.Update(q.Ref(q.Collection("test-collection"), "243591207984300546"), { data: { tags: ["pet", "cute"] }}))
+					.then(data => console.log(data))
+					.catch(error => console.error(error));
+			}
+
+			function faunaDelete() {
+				console.log('delete');
+
+				client
+					.query(q.Get(q.Ref(q.Collection("test-collection"), "243591207984300546")))
+					.then(data => console.log(data))
+					.catch(data => console.log(data))
+			}
+		</script>
 	</body>
 </html>
