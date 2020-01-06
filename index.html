@@ -19,7 +19,7 @@
 		<script src="https://cdn.jsdelivr.net/gh/fauna/faunadb-js-release@2.8.1/faunadb-min.js"></script>
 		<script>
 			// Set secret
-			const secret = 'CHANGE THIS';
+			const secret = 'fnADhK2G5jACAOcY7DGN6EtMJmIazk8dv2L0GY4Y';
 
 			// Set up client
 			let q = faunadb.query,
@@ -78,20 +78,142 @@
 		</section>
 
 		<script>
-			function faunaCreateDb() {
-				console.log('create new db');
+
+				function    faunaCreateDb(){
+
+			  const id = "253610776752816651"
+			  console.log(`Function 'todo-read' invoked. Read id: ${id}`)
+			 client.query(q.Get(q.Ref(`classes/todos/${id}`)))
+			    .then((response) => {
+			      console.log('success', response.data.t888)
+			    }).catch((error) => {
+			      console.log('error', error)
+    })
+			    //   alert(JSON.stringify(todos));
+		//console.log("getServerTodos", todos)
+   }
+
+
+	function    faunaCreateDb111(){
+
+    const Q = q.Map(
+      q.Paginate(q.Match(q.Index(`indexes/all_todos`), "todos")),
+      q.Lambda("X", q.Get(q.Select(1, q.Var("X"))))
+    );
+
+    const R = client.query(Q);
+    console.log(R);
+}
+
+		function    faunaCreateDb6666(){
+
+	var todos =  	client.query(q.Paginate(q.Match(q.Ref(`indexes/all_todos`), "todos")));
+	       alert(JSON.stringify(todos));
+console.log("getServerTodos", todos)
+   }
+
+
+		function    faunaCreateDb33(){
+		     client.query(
+		       q.Map(
+		         q.Paginate(
+		           q.Match(
+		             q.Ref("indexes/all_todos"))), (ref) => q.Get(ref))).then((r) => {
+		       console.log("getServerTodos", r)
+		       var todos = r.data;
+		       alert(JSON.stringify(todos));
+		     });
+   }
+
+
+
+		function    faunaCreateDb555(){
+
+  //Ref = q.Ref,
+  //Match = q.Match;
+
+var log = console.log.bind(console);
+
+
+
+console.log("get alice ref")
+
+
+    console.log("get alice name");
+  var todos =   client.query(
+  q.Paginate(q.Match(q.Ref("indexes/all_todos"), "todos")),
+    { size: 2 }).then(function (res) {
+      console.log("page one", res)
+      client.query(
+        q.Paginate(q.Match(q.Ref("indexes/all_todos"), "todos"), {
+          after: res.after,
+          size: 2
+        })).then(function (res) {
+          console.log("page two", res)
+
+          var posts = q.Paginate(q.Match(q.Ref("indexes/all_todos"), "todos"));
+          return client.query(q.Map(posts, function(post) { return q.Casefold(post); })).then(log)
+
+        })
+    })
+
+
+		       alert(JSON.stringify(todos));
+console.log("getServerTodos", todos)
+   }
+			function faunaCreateDb777() {
+				//client
+				//	.query(
+				//		q.Create(
+				//		q.Select(['ref'], q.Var('todos')), { data: { name: '888' } }
+							//q.Select(["data", "todos"], q.Var('todos'))
+				//		))
+				//	.then(data => console.log(data))
+				//	.catch(error => console.error(error));
+ //client.query(
+ //      Select(["ref"], Get(Match(Index("all_todos"), "todos")))
+  //  ).then(data => console.log(data))
+	//				.catch(error => console.error(error));
+			//	client
+			//		.query(q.Select(q.Ref(q.Collection("todos"), "253610776752816651"), { data: { title: "What I had 99for breakfast .."  }}))
+			//		.then(data => console.log(data))
+			//		.catch(error => console.error(error));
+// var helper = client.paginate(q.Match(q.Index('all_todos'), "todos"));
+var helper = client.query(q.Get(q.Ref("classes/todos/1")));
+console.log(JSON.stringify(helper.data));
+alert(JSON.stringify(helper.data));
+
+// client.query(
+  //    q.Select("classes/todos/1",
+  //      q.Match(q.Index('all_todos'), "todos")
+   //   ))			.then(data => console.log(data))
+	//				.catch(error => console.error(error));
+
+			//	client
+			//		.query(q.CreateDatabase({ name: 'test-database' }))
+			//		.then(data => console.log(data))
+			//		.catch(error => console.error(error));
+			}
+function faunaCreateCollection() {
+
 
 				client
-					.query(q.CreateDatabase({ name: 'test-database' }))
+					.query(
+						q.Create(
+							q.Select(["data", "todos"], q.Var('todos')),
+							{ data: { todos: "todos" }
+						}))
 					.then(data => console.log(data))
 					.catch(error => console.error(error));
-			}
 
-			function faunaCreateCollection() {
+  			//	client.query(q.Create(q.Select(['ref'], q.Var('todos')), { data: { title: "What I had 99for breakfast .."  } })
+
+}
+			function faunaCreateCollection99() {
 				console.log('create new collection');
 
 				client
-					.query(q.CreateCollection({ name: "test-collection" }))
+					.query(q.CreateCollection({ name: "tes88t-collection" }))
 					.then(data => console.log(data))
 					.catch(error => console.error(error));
 			}
@@ -111,12 +233,12 @@
 			}
 
 			function faunaCreate() {
-				console.log('create');
+
 
 				client
 					.query(
 						q.Create(
-							q.Collection("test-collection"),
+							q.Collection("todos"),
 							{ data: { title: "What I had for breakfast .." }
 						}))
 					.then(data => console.log(data))
@@ -127,16 +249,16 @@
 				console.log('read');
 
 				client
-					.query(q.Get(q.Ref(q.Collection("test-collection"), "243591207984300546")))
+					.query(q.Get(q.Ref(q.Collection("todos"), "253610776752816651")))
 					.then(data => console.log(data))
 					.catch(error => console.error(error));
 			}
 
 			function faunaUpdate() {
-				console.log('update');
+  insert_ts = Math.floor((new Date()).getTime()/ 1000);
 
 				client
-					.query(q.Update(q.Ref(q.Collection("test-collection"), "243591207984300546"), { data: { tags: ["pet", "cute"] }}))
+					.query(q.Update(q.Ref(q.Collection("todos"), "253610776752816651"), { data: { title: insert_ts}}))
 					.then(data => console.log(data))
 					.catch(error => console.error(error));
 			}
